@@ -1,0 +1,12 @@
+obj/ecommerce-api.csproj.nuget.dgspec.json
+obj/ecommerce-api.csproj.nuget.g.props
+obj/ecommerce-api.csproj.nuget.g.targets
+obj/project.assets.json
+obj/project.nuget.cache
+obj/Debug/net8.0/.NETCoreApp,Version=v8.0.AssemblyAttributes.cs
+obj/Debug/net8.0/ecommerce-api.AssemblyInfo.cs
+obj/Debug/net8.0/ecommerce-api.AssemblyInfoInputs.cache
+obj/Debug/net8.0/ecommerce-api.assets.cache
+obj/Debug/net8.0/ecommerce-api.csproj.AssemblyReference.cache
+obj/Debug/net8.0/ecommerce-api.GeneratedMSBuildEditorConfig.editorconfig
+obj/Debug/net8.0/ecommerce-api.GlobalUsings.g.cs
