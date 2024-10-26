@@ -16,7 +16,7 @@ namespace ecommerce_api.Models
         public bool Availability { get; set; }
         public List<string> Colors { get; set; }
         public List<string> StorageOptions { get; set; }
-        public string ImageUrl { get; set; }
+        public List<string> Images { get; set; }
         public string Description { get; set; }
         //Key - Value pair for product specifications
         public string SpecificationsJson { get; set; }

@@ -88,10 +88,11 @@ namespace ecommerce_api.Controllers
                 Id = p.Id,
                 Name = p.Name,
                 Price = p.Price,
-                DiscountPrice = p.DiscountPrice,
-                ImageUrl = p.ImageUrl,
+                Discount_price = p.DiscountPrice,
+                Image = p.Images.FirstOrDefault(),
+
                 Colors = p.Colors,
-                StorageOptions = p.StorageOptions
+                Storage = p.StorageOptions
             }).ToList();
 
             return Ok(productDTOs);
@@ -113,10 +114,11 @@ namespace ecommerce_api.Controllers
                 Id = product.Id,
                 Name = product.Name,
                 Price = product.Price,
-                DiscountPrice = product.DiscountPrice,
-                Images = new List<string> { product.ImageUrl },
+
                 Colors = product.Colors,
-                StorageOptions = product.StorageOptions,
+                Images = product.Images,
+                Storage = product.StorageOptions,
+                Discount_price = product.DiscountPrice,
                 Specifications = product.Specifications,
                 Description = product.Description
             };

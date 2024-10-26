@@ -11,10 +11,10 @@ namespace ecommerce_api.DTO
         public int Id { get; set; }
         public string Name { get; set; }
         public decimal Price { get; set; }
-        public decimal? DiscountPrice { get; set; }
-        public string ImageUrl { get; set; }
+        public decimal? Discount_price { get; set; }
+        public string Image { get; set; }
         public List<string> Colors { get; set; }
-        public List<string> StorageOptions { get; set; }
+        public List<string> Storage { get; set; }
     }
 
 
