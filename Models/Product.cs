@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -14,12 +15,33 @@ namespace ecommerce_api.Models
         public decimal? DiscountPrice { get; set; }
         public float Rating { get; set; }
         public bool Availability { get; set; }
+        [DefaultValue(0)]
+        public decimal ImportPrice { get; set; }
         public List<string> Colors { get; set; }
         public List<string> StorageOptions { get; set; }
         public List<string> Images { get; set; }
+
+
         public string Description { get; set; }
         //Key - Value pair for product specifications
         public string SpecificationsJson { get; set; }
+        // Marked by admin or system
+        [DefaultValue(false)]
+        public bool IsBestSeller { get; set; }
+        // Marked by admin
+        [DefaultValue(false)]
+        public bool IsFeatured { get; set; }
+        public DateTime ReleaseDate { get; set; }
+
+        public DateTime CreatedAt { get; set; }
+        // Marked by admin or system
+        [DefaultValue(false)]
+        public bool IsNewArrival { get; set; }
+
+        //Ignore this property. Used for mapping
+
+        public ICollection<Category> Categories { get; set; } = new List<Category>();
+
         //Not mapped 
         //Returned value as a map
         public Dictionary<string, string> Specifications

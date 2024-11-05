@@ -6,6 +6,9 @@ using ecommerce_api.DTO;
 using Microsoft.AspNetCore.Mvc;
 using ecommerce_api.Models;
 using Microsoft.EntityFrameworkCore;
+using ecommerce_api.DTO.Product;
+using ecommerce_api.DTO.Category;
+using AutoMapper;
 
 
 namespace ecommerce_api.Controllers
@@ -16,10 +19,12 @@ namespace ecommerce_api.Controllers
     public class ProductsController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly IMapper _mapper;
 
-        public ProductsController(AppDbContext context)
+        public ProductsController(AppDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         // GET /products
@@ -35,16 +40,18 @@ namespace ecommerce_api.Controllers
             [FromQuery] int page = 1,
             [FromQuery] int limit = 10)
         {
-            var query = _context.Products.AsQueryable();
+            var query = _context.Products
+            .Include(p => p.Categories)
+            .AsQueryable();
 
             // Add filtering logic
             if (!string.IsNullOrEmpty(category))
             {
-                query = query.Where(p => p.Name.Contains(category)); // Simplified example
+                query = query.Where(p => p.Categories.Any(c => c.Name == category));
             }
             if (!string.IsNullOrEmpty(keyword))
             {
-                query = query.Where(p => p.Name.Contains(keyword)); // Simplified example
+                query = query.Where(p => p.Name.Contains(keyword));
             }
             if (price_min != null)
             {
@@ -83,45 +90,27 @@ namespace ecommerce_api.Controllers
             // Pagination
             var products = await query.Skip((page - 1) * limit).Take(limit).ToListAsync();
 
-            var productDTOs = products.Select(p => new ProductDTO
+            var productDTOs = _mapper.Map<List<ProductDTO>>(products);
+            //Turn in to res that has .products 
+            var mapped = new ProductListDTO
             {
-                Id = p.Id,
-                Name = p.Name,
-                Price = p.Price,
-                Discount_price = p.DiscountPrice,
-                Image = p.Images.FirstOrDefault(),
-
-                Colors = p.Colors,
-                Storage = p.StorageOptions
-            }).ToList();
-
-            return Ok(productDTOs);
+                Products = productDTOs,
+                Total = productDTOs.Count
+            };
+            return Ok(mapped);
         }
 
         // GET /product/{product_id}
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDetailsDTO>> GetProduct(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _context.Products.Include(p => p.Categories).FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
             {
                 return NotFound();
             }
-
-            var productDetailDTO = new ProductDetailsDTO
-            {
-                Id = product.Id,
-                Name = product.Name,
-                Price = product.Price,
-
-                Colors = product.Colors,
-                Images = product.Images,
-                Storage = product.StorageOptions,
-                Discount_price = product.DiscountPrice,
-                Specifications = product.Specifications,
-                Description = product.Description
-            };
+            var productDetailDTO = _mapper.Map<ProductDetailsDTO>(product);
             return Ok(productDetailDTO);
         }
     }
