@@ -72,3 +72,9 @@ obj/Debug/net8.0/refint/ecommerce-api.dll
 obj/Debug/net8.0/staticwebassets/msbuild.build.ecommerce-api.props
 obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.ecommerce-api.props
 obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.ecommerce-api.props
+bin/Debug/net8.0/AutoMapper.dll
+bin/Debug/net8.0/AutoMapper.Extensions.Microsoft.DependencyInjection.dll
+bin/Debug/net8.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+bin/Debug/net8.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
+bin/Debug/net8.0/Microsoft.Bcl.TimeProvider.dll
+bin/Debug/net8.0/Microsoft.IdentityModel.Abstractions.dll
