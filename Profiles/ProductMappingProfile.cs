@@ -36,10 +36,10 @@ namespace ecommerce_api.Profiles
                     Id = c.Id,
                     Name = c.Name
                 }).ToList()))
-                .ForMember(dest => dest.IsBestSeller, opt => opt.MapFrom(src => src.IsBestSeller))
-                .ForMember(dest => dest.IsFeatured, opt => opt.MapFrom(src => src.IsFeatured))
-                .ForMember(dest => dest.IsNewArrival, opt => opt.MapFrom(src => src.IsNewArrival))
-                .ForMember(dest => dest.ReleaseDate, opt => opt.MapFrom(src => src.ReleaseDate));
+                .ForMember(dest => dest.Is_bestseller, opt => opt.MapFrom(src => src.IsBestSeller))
+                .ForMember(dest => dest.Is_featured, opt => opt.MapFrom(src => src.IsFeatured))
+                .ForMember(dest => dest.Is_new_arrival, opt => opt.MapFrom(src => src.IsNewArrival))
+                .ForMember(dest => dest.Release_date, opt => opt.MapFrom(src => src.ReleaseDate));
 
 
             // Product -> ProductDTO
@@ -59,10 +59,10 @@ namespace ecommerce_api.Profiles
                     Name = c.Name
                 }).ToList()))
 
-                .ForMember(dest => dest.IsBestSeller, opt => opt.MapFrom(src => src.IsBestSeller))
-                .ForMember(dest => dest.IsFeatured, opt => opt.MapFrom(src => src.IsFeatured))
-                .ForMember(dest => dest.IsNew, opt => opt.MapFrom(src => src.IsNewArrival))
-                .ForMember(dest => dest.ReleaseDate, opt => opt.MapFrom(src => src.ReleaseDate));
+                .ForMember(dest => dest.Is_bestseller, opt => opt.MapFrom(src => src.IsBestSeller))
+                .ForMember(dest => dest.Is_featured, opt => opt.MapFrom(src => src.IsFeatured))
+                .ForMember(dest => dest.Is_new_arrival, opt => opt.MapFrom(src => src.IsNewArrival))
+                .ForMember(dest => dest.Release_date, opt => opt.MapFrom(src => src.ReleaseDate));
         }
     }
 }

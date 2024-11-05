@@ -22,10 +22,10 @@ namespace ecommerce_api.DTO.Product
         // Implement rating later
         public decimal Rating { get; set; }
         public List<CategoryDTO> Categories { get; set; }
-        public bool IsBestSeller { get; set; }
-        public bool IsFeatured { get; set; }
-        public bool IsNew { get; set; }
-        public DateTime ReleaseDate { get; set; }
+        public bool Is_bestseller { get; set; }
+        public bool Is_featured { get; set; }
+        public bool Is_new_arrival { get; set; }
+        public DateTime Release_date { get; set; }
 
 
     }
