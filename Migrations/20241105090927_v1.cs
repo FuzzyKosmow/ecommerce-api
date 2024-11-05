@@ -64,31 +64,20 @@ namespace ecommerce_api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Products",
+                name: "Promotions",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    DiscountPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
-                    Rating = table.Column<float>(type: "real", nullable: false),
-                    Availability = table.Column<bool>(type: "bit", nullable: false),
-                    ImportPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Colors = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StorageOptions = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Images = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SpecificationsJson = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsBestSeller = table.Column<bool>(type: "bit", nullable: false),
-                    IsFeatured = table.Column<bool>(type: "bit", nullable: false),
-                    ReleaseDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
-                    IsNewArrival = table.Column<bool>(type: "bit", nullable: false)
+                    DiscountPercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    ValidUntil = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
+                    ApplicableProductIds = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Products", x => x.Id);
+                    table.PrimaryKey("PK_Promotions", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -198,6 +187,40 @@ namespace ecommerce_api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Products",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    DiscountPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: true),
+                    Rating = table.Column<float>(type: "real", nullable: false),
+                    Availability = table.Column<bool>(type: "bit", nullable: false),
+                    ImportPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Colors = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StorageOptions = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Images = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SpecificationsJson = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsBestSeller = table.Column<bool>(type: "bit", nullable: false),
+                    IsFeatured = table.Column<bool>(type: "bit", nullable: false),
+                    ReleaseDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "getdate()"),
+                    IsNewArrival = table.Column<bool>(type: "bit", nullable: false),
+                    PromotionId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Products", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Products_Promotions_PromotionId",
+                        column: x => x.PromotionId,
+                        principalTable: "Promotions",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ProductCategories",
                 columns: table => new
                 {
@@ -264,6 +287,11 @@ namespace ecommerce_api.Migrations
                 name: "IX_ProductCategories_ProductsId",
                 table: "ProductCategories",
                 column: "ProductsId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Products_PromotionId",
+                table: "Products",
+                column: "PromotionId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -297,6 +325,9 @@ namespace ecommerce_api.Migrations
 
             migrationBuilder.DropTable(
                 name: "Products");
+
+            migrationBuilder.DropTable(
+                name: "Promotions");
         }
     }
 }
