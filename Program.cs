@@ -1,5 +1,14 @@
+using System.Text;
+using System.Text.Json.Serialization;
 using ecommerce_api;
+using ecommerce_api.Models;
+using ecommerce_api.Profiles;
+using ecommerce_api.Services.Cookies;
+using ecommerce_api.Services.JWT;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,7 +16,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
-//CORS anywhere
+// CORS anywhere
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(builder =>
@@ -17,15 +26,70 @@ builder.Services.AddCors(options =>
                .AllowAnyHeader();
     });
 });
-
+// Database
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+
+// JSON Serialization settings
+builder.Services.AddControllers().AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+    });
+// Database: Register seeding service for development
+builder.Services.AddTransient<DatabaseSeeder>();
+
+// JWT Settings and service
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+builder.Services.Configure<JwtSettings>(jwtSettings);
+builder.Services.AddScoped<JwtService>();
+// Identity
+builder.Services.AddIdentityCore<ApplicationUser>(options =>
+{
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequiredLength = 6;
+})
+    .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<AppDbContext>();
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = false,
+        ValidateAudience = false,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Secret"])),
+    };
+});
+builder.Services.AddAuthorization(options =>
+{
+    // Roles
+    options.AddPolicy("AdminPolicy", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("UserPolicy", policy => policy.RequireRole("User"));
+});
+
+
+
+// Profiles mapping
+builder.Services.AddAutoMapper(typeof(UserMappingProfile));
+builder.Services.AddAutoMapper(typeof(ProductMappingProfile));
+
 var app = builder.Build();
+
 app.UseCors();
-// Configure the HTTP request pipeline.
+
+// Seed if is development
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -33,18 +97,18 @@ if (app.Environment.IsDevelopment())
     // //Apply migrations
     using (var scope = app.Services.CreateScope())
     {
-        var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-        db.Database.Migrate();
-        db.Seed();
+        var seeder = scope.ServiceProvider.GetRequiredService<DatabaseSeeder>();
+        await seeder.EnsureRoles();
+
+        await seeder.SeedDatabase();
     }
 }
-app.UseRouting();
-app.UseEndpoints(endpoints =>
-{
-    endpoints.MapControllers();
-});
-
 app.UseHttpsRedirection();
+
+// JWT Middleware
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
 
 
 
