@@ -3,6 +3,7 @@ using System.Text.Json.Serialization;
 using ecommerce_api;
 using ecommerce_api.Models;
 using ecommerce_api.Profiles;
+using ecommerce_api.Services;
 using ecommerce_api.Services.Cookies;
 using ecommerce_api.Services.JWT;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -84,6 +85,11 @@ builder.Services.AddAuthorization(options =>
 // Profiles mapping
 builder.Services.AddAutoMapper(typeof(UserMappingProfile));
 builder.Services.AddAutoMapper(typeof(ProductMappingProfile));
+
+
+// Services
+builder.Services.AddScoped<PromotionService>();
+
 
 var app = builder.Build();
 

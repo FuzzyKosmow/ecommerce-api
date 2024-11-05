@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ecommerce_api;
 
@@ -11,9 +12,10 @@ using ecommerce_api;
 namespace ecommerce_api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241105083958_v2")]
+    partial class v2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -178,9 +180,6 @@ namespace ecommerce_api.Migrations
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<int?>("PromotionId")
-                        .HasColumnType("int");
-
                     b.Property<float>("Rating")
                         .HasColumnType("real");
 
@@ -196,8 +195,6 @@ namespace ecommerce_api.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("PromotionId");
 
                     b.ToTable("Products");
                 });
@@ -380,13 +377,6 @@ namespace ecommerce_api.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ecommerce_api.Models.Product", b =>
-                {
-                    b.HasOne("ecommerce_api.Models.Promotion", null)
-                        .WithMany("Products")
-                        .HasForeignKey("PromotionId");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -436,11 +426,6 @@ namespace ecommerce_api.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("ecommerce_api.Models.Promotion", b =>
-                {
-                    b.Navigation("Products");
                 });
 #pragma warning restore 612, 618
         }

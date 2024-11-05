@@ -229,6 +229,24 @@ namespace ecommerce_api.Services.JWT
             }
             await _context.SaveChangesAsync();
 
+            Console.WriteLine("Database seeded successfully");
+            // Promotion
+            // Create a promotion that apply to id 1,2
+            // Discount is 50%, valid until 1 month from now
+            if (await _context.Promotions.CountAsync() == 0)
+            {
+                var promotion = new Promotion
+                {
+                    Name = "50% off for all products",
+                    DiscountPercentage = 50,
+                    ValidUntil = DateTime.Now.AddMonths(1),
+                    IsActive = true,
+                    ApplicableProductIds = new List<int> { 1, 2 }
+                };
+                await _context.Promotions.AddAsync(promotion);
+                await _context.SaveChangesAsync();
+            }
+
 
         }
     }

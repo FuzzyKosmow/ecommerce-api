@@ -24,8 +24,10 @@ namespace ecommerce_api
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<Promotion> Promotions { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            //products, category
             base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Product>()
                 .HasMany(p => p.Categories)
@@ -55,11 +57,22 @@ namespace ecommerce_api
                     v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).ToList()
                 );
 
-
-            //CreatedAt default value
             modelBuilder.Entity<Product>()
                 .Property(p => p.CreatedAt)
                 .HasDefaultValueSql("getdate()");
+
+
+            // promotion
+            modelBuilder.Entity<Promotion>()
+                .Property(p => p.ApplicableProductIds)
+                .HasConversion(
+                    v => string.Join(',', v),
+                    v => v.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(int.Parse).ToList()
+                );
+
+
+            modelBuilder.Entity<Promotion>()
+                .HasMany(p => p.Products);
 
         }
 
