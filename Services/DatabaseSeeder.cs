@@ -246,8 +246,56 @@ namespace ecommerce_api.Services.JWT
                 await _context.Promotions.AddAsync(promotion);
                 await _context.SaveChangesAsync();
             }
+            await CreateOrder(_context);
 
 
+        }
+        public async Task CreateOrder(AppDbContext context)
+        {
+            // Retrieve the product from the database (assuming it has an Id of 3)
+            var product = await context.Products.FindAsync(3);
+
+            if (product == null)
+            {
+                Console.WriteLine("Product not found");
+                return;
+            }
+
+            // Determine the price based on DiscountPrice or Price
+            decimal effectivePrice = product.DiscountPrice != null && product.DiscountPrice > 0 ? product.DiscountPrice.Value : product.Price;
+            // Add to the first user with role User
+            var firstUserInDb = await context.Users.FirstOrDefaultAsync(u => u.Email == "user1@gm.com");
+
+            if (firstUserInDb == null)
+            {
+                Console.WriteLine("User not found");
+                return;
+            }
+            // Create a new order
+            var order = new Order
+            {
+                UserId = firstUserInDb.Id,
+                OrderDate = DateTime.Now,
+                Status = "Pending",
+                PaymentMethod = "Credit Card",
+                OrderDetails = new List<OrderDetail>
+        {
+            new OrderDetail
+            {
+                ProductId = product.Id,
+                Quantity = 2,  // Example quantity
+                Price = effectivePrice
+            }
+        }
+            };
+
+            // Add the order to the context
+            context.Orders.Add(order);
+
+            // Save changes to the database
+            await context.SaveChangesAsync();
+
+            Console.WriteLine($"Order created successfully with ID {order.Id} and TotalPrice {order.TotalPrice}");
         }
     }
 }

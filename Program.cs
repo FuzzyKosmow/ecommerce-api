@@ -6,6 +6,8 @@ using ecommerce_api.Profiles;
 using ecommerce_api.Services;
 using ecommerce_api.Services.Cookies;
 using ecommerce_api.Services.JWT;
+using ecommerce_api.Services.OrderService;
+using ecommerce_api.Services.ProductService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -89,6 +91,8 @@ builder.Services.AddAutoMapper(typeof(ProductMappingProfile));
 
 // Services
 builder.Services.AddScoped<PromotionService>();
+builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 
 
 var app = builder.Build();

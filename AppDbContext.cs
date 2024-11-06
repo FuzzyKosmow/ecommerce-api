@@ -25,10 +25,16 @@ namespace ecommerce_api
         public DbSet<Category> Categories { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Promotion> Promotions { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderDetail> OrderDetails { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+
+
+
+
+
             //products, category
-            base.OnModelCreating(modelBuilder);
             modelBuilder.Entity<Product>()
                 .HasMany(p => p.Categories)
                 .WithMany(c => c.Products)
@@ -73,6 +79,24 @@ namespace ecommerce_api
 
             modelBuilder.Entity<Promotion>()
                 .HasMany(p => p.Products);
+
+
+
+            //Orders
+            modelBuilder.Entity<OrderDetail>()
+               .HasKey(od => od.Id);
+            modelBuilder.Entity<Order>()
+             .HasMany(o => o.OrderDetails)
+             .WithOne(od => od.Order)
+             .HasForeignKey(od => od.OrderId)
+             .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Order>()
+                .Ignore(o => o.TotalPrice);
+
+
+
+
+            base.OnModelCreating(modelBuilder);
 
         }
 
