@@ -57,6 +57,12 @@ namespace ecommerce_api.Controllers
                 Console.WriteLine("Invalid Email");
                 return BadRequest(new { message = "Invalid credentials" });
             }
+
+            if (!user.IsActive)
+            {
+                Console.WriteLine("User account is disabled");
+                return BadRequest(new { message = "Account is disabled" });
+            }
             if (!await _userManager.CheckPasswordAsync(user, dto.Password))
             {
 

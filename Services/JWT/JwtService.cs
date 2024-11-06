@@ -40,6 +40,8 @@ namespace ecommerce_api.Services.JWT
         new Claim("FullName", user.FullName),
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
         new Claim("Username", user.UserName),
+        //Id claim
+        new Claim(ClaimTypes.NameIdentifier, user.Id),
         new Claim(ClaimTypes.Name, user.UserName)
     };
 
