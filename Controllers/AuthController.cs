@@ -69,12 +69,13 @@ namespace ecommerce_api.Controllers
         // Authenticate
         [HttpGet("authenticate")]
         [Authorize]
-        public IActionResult Authenticate()
+        public async Task<IActionResult> Authenticate()
         {
-            return Ok("Authenticated");
+            // Name is configured to be the email in JWT (which should also be unique)
+            return Ok(await _jwtService.GenerateToken(await _userManager.FindByEmailAsync(User.Identity.Name)));
         }
         [HttpGet("me")]
-        [Authorize]
+        [Authorize(Roles = "User,Admin")]
         public async Task<IActionResult> Me()
         {
             var user = await _userManager.FindByEmailAsync(User.Identity.Name);
