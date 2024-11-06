@@ -63,6 +63,22 @@ namespace ecommerce_api.Profiles
                 .ForMember(dest => dest.Is_featured, opt => opt.MapFrom(src => src.IsFeatured))
                 .ForMember(dest => dest.Is_new_arrival, opt => opt.MapFrom(src => src.IsNewArrival))
                 .ForMember(dest => dest.Release_date, opt => opt.MapFrom(src => src.ReleaseDate));
+
+
+            //Create ProductDTO -> Product
+            CreateMap<CreateProductDTO, Product>()
+                .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Name))
+                .ForMember(dest => dest.Price, opt => opt.MapFrom(src => src.Price))
+                .ForMember(dest => dest.Colors, opt => opt.MapFrom(src => src.Colors))
+                .ForMember(dest => dest.StorageOptions, opt => opt.MapFrom(src => src.StorageOptions))
+                .ForMember(dest => dest.Images, opt => opt.MapFrom(src => src.Images))
+                .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
+                .ForMember(dest => dest.ImportPrice, opt => opt.MapFrom(src => src.ImportPrice))
+                .ForMember(dest => dest.Specifications, opt => opt.MapFrom(src => src.Specifications))
+                .ForMember(dest => dest.ReleaseDate, opt => opt.MapFrom(src => src.ReleaseDate));
+
+            CreateMap<UpdateProductDTO, Product>()
+                .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
         }
     }
 }

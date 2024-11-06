@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using ecommerce_api.DTO.Product;
 using ecommerce_api.DTO.Category;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 
 namespace ecommerce_api.Controllers
@@ -166,6 +167,34 @@ namespace ecommerce_api.Controllers
             var products = await _context.Products.Where(p => p.DiscountPrice != null && p.DiscountPrice > 0).ToListAsync();
             var productDTOs = _mapper.Map<List<ProductDTO>>(products);
             return Ok(productDTOs);
+        }
+
+
+        [HttpGet("categories")]
+        public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetCategories()
+        {
+            var categories = await _context.Categories.ToListAsync();
+            var categoryDTOs = _mapper.Map<List<CategoryDTO>>(categories);
+            return Ok(categoryDTOs);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<ProductDTO>> CreateProduct(CreateProductDTO productDTO)
+        {
+            var product = _mapper.Map<Product>(productDTO);
+            var categories = await _context.Categories.Where(c => productDTO.CategoryIds.Contains(c.Id)).ToListAsync();
+            product.CreatedAt = DateTime.Now;
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+            //Link product to categories
+            if (categories.Count > 0)
+            {
+                product.Categories = categories;
+            }
+            await _context.SaveChangesAsync();
+            var productDTOToReturn = _mapper.Map<ProductDTO>(product);
+            return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, productDTOToReturn);
         }
 
 
