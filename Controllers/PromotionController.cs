@@ -85,11 +85,19 @@ namespace ecommerce_api.Controllers
             return Ok("Expired promotions cleared");
         }
         /// <summary>
-        ///     Apply a promotion to products in the promotion
+        ///     Apply a promotion to products in the promotion. Promoted products will have discounted price.
+        ///     There will be automated task to run apply available promotions, or is applied manually by admin
+        ///     Promotion can be applied and deactivated multiple times. There will be a discount percentage.
+        ///     There will also be a list of product ids that the promotion is applicable to
         /// </summary>
         /// <param name="id">
         ///     Promotion id
         /// </param>
+        /// <returns>
+        ///    200: Promotion applied
+        ///    404: Promotion not found
+        ///    500: Internal server error
+        /// </returns>
         [HttpPost("apply/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult> ApplyPromotion(int id)
@@ -113,7 +121,11 @@ namespace ecommerce_api.Controllers
         ///    Deactivate a promotion. Also clear discounts applied to products in the promotion
         /// </summary>
         /// <param name="id"></param>
-        /// <returns></returns>
+        /// <returns>
+        ///     200: Promotion deactivated
+        ///     404: Promotion not found
+        ///     500: Internal server error
+        /// </returns>
         [HttpPost("deactivate/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult> DeactivatePromotion(int id)
@@ -130,7 +142,7 @@ namespace ecommerce_api.Controllers
         }
 
 
-        // Promo code section
+
 
 
 

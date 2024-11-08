@@ -13,6 +13,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ecommerce_api.Controllers
 {
+    /// <summary>
+    /// Controller for handling user authentication
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
@@ -30,7 +33,14 @@ namespace ecommerce_api.Controllers
             _jwtService = jwtService;
         }
 
-
+        /// <summary>
+        /// Register a new user. Phone number , address , province, ... are optional. They are used as a quick shortcut for user to use in checkout
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns>  
+        ///    200: Authentication token
+        ///    400: Bad request if email is already taken
+        /// </returns>
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterUserDto dto)
         {
@@ -45,7 +55,14 @@ namespace ecommerce_api.Controllers
             await _userManager.AddToRoleAsync(newUser, "User");
             return Ok(await _jwtService.GenerateToken(newUser));
         }
-
+        /// <summary>
+        /// Login with email and password
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns>
+        ///     200: Authentication token
+        ///     400: Bad request if email is not found or password is incorrect
+        /// </returns>
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginUserDto dto)
         {
@@ -72,7 +89,15 @@ namespace ecommerce_api.Controllers
             return Ok(await _jwtService.GenerateToken(user));
 
         }
-        // Authenticate
+        /// <summary>
+        /// Authenticate with JWT. This is used to refresh and get a new token. The old token is still valid until it expires
+        /// Only authenticated user can access this endpoint. It is quite scuffed as of now. Best to just re-login if token is invalid
+        /// </summary>
+        /// <returns>
+        ///     200: Authentication token
+        ///     401: Unauthorized if token is invalid
+        ///     403: Forbidden if user is not authenticated
+        /// </returns>
         [HttpGet("authenticate")]
         [Authorize]
         public async Task<IActionResult> Authenticate()
@@ -80,6 +105,14 @@ namespace ecommerce_api.Controllers
             // Name is configured to be the email in JWT (which should also be unique)
             return Ok(await _jwtService.GenerateToken(await _userManager.FindByEmailAsync(User.Identity.Name)));
         }
+        /// <summary>
+        /// Get user information. Only authenticated user can access this endpoint
+        /// </summary>
+        /// <returns>
+        ///     200: User information (UserDto)
+        ///     401: Unauthorized if token is invalid
+        ///     403: Forbidden if user is not authenticated
+        /// </returns>
         [HttpGet("me")]
         [Authorize(Roles = "User,Admin")]
         public async Task<IActionResult> Me()

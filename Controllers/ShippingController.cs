@@ -8,6 +8,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ecommerce_api.Controllers
 {
+    /// <summary>
+    /// Controller for handling shipping. Current implementation is for calculating shipping cost only and is placeholder
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class ShippingController : ControllerBase
@@ -18,7 +21,13 @@ namespace ecommerce_api.Controllers
             _shippingService = shippingService;
         }
 
-        // Take in Province, District, Address and method. Return estimation of shipping price.
+        /// <summary>
+        /// Calculate shipping cost for a given address. Current implementation only care about shipping method.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns>
+        ///     200: The shipping cost
+        /// </returns>
         [HttpPost]
         public async Task<IActionResult> CalculateShippingCost([FromBody] ShippingRequest request)
         {

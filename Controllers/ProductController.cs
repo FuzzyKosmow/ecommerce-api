@@ -14,9 +14,11 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace ecommerce_api.Controllers
 {
+    /// <summary>
+    /// Controller for handling products. Used for both customer and admin
+    /// </summary>
     [ApiController]
     [Route("api/products")]
-
     public class ProductsController : ControllerBase
     {
         private readonly AppDbContext _context;
@@ -29,7 +31,40 @@ namespace ecommerce_api.Controllers
             _mapper = mapper;
         }
 
-        // GET /products
+        /// <summary>
+        /// Get a list of products with optional filters and pagination
+        /// </summary>
+        /// <param name="category">
+        ///     Each product has a list of category that it belongs to. This filter will return products that belong to the specified category
+        ///     EXAMPLE: Iphone, Samsung, Android, ETC. Tagging a product with multiple categories is possible
+        /// </param>
+        /// <param name="keyword">
+        ///     Search for products that contain the keyword in their name
+        /// </param>
+        /// <param name="price_min">
+        ///     Filter products with price greater than or equal to this value
+        /// </param>
+        /// <param name="price_max">
+        ///     Filter products with price less than or equal to this value
+        /// </param>
+        /// <param name="color">
+        ///     Filter products that have the specified color(s)
+        /// </param>
+        /// <param name="storage">
+        ///     Filter products that have the specified storage option(s)
+        /// </param>
+        /// <param name="sort">
+        ///     Sort the products by price in ascending or descending order, or by discount
+        /// </param>
+        /// <param name="page">
+        ///     The page number for pagination
+        /// </param>
+        /// <param name="limit">
+        ///     The number of products per page
+        /// </param>
+        /// <returns>
+        ///     200: The list of products, total number of products before pagination. Even if empty, it will return an empty list
+        /// </returns>
         [HttpGet]
         public async Task<ActionResult<ProductListDTO>> GetProducts(
     [FromQuery] string? category,
@@ -126,7 +161,15 @@ namespace ecommerce_api.Controllers
         }
 
 
-        // GET /product/{product_id}
+        /// <summary>
+        /// Get a product by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns>
+        ///     200: The product
+        ///     404: Not found if the product does not exist
+        ///     500: Internal server error if there is an exception
+        /// </returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDetailsDTO>> GetProduct(int id)
         {
@@ -139,6 +182,14 @@ namespace ecommerce_api.Controllers
             var productDetailDTO = _mapper.Map<ProductDetailsDTO>(product);
             return Ok(productDetailDTO);
         }
+        /// <summary>
+        /// Get featured products. Used on home page
+        ///    Featured products are products that are marked as featured by admin
+        /// </summary>
+        /// <returns>
+        ///     200: The list of featured products
+        ///     500: Internal server error if there is an exception
+        /// </returns>
         [HttpGet("featured")]
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetFeaturedProducts()
         {
@@ -146,6 +197,14 @@ namespace ecommerce_api.Controllers
             var productDTOs = _mapper.Map<List<ProductDTO>>(products);
             return Ok(productDTOs);
         }
+        /// <summary>
+        /// Get new arrival products. Used on home page
+        ///    New arrival products are products that are released recently or is marked as new arrival by admin
+        /// </summary>
+        /// <returns>
+        ///     200: The list of new arrival products
+        ///     500: Internal server error if there is an exception
+        /// </returns>
         [HttpGet("new-arrivals")]
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetNewArivalProducts()
         {
@@ -153,6 +212,14 @@ namespace ecommerce_api.Controllers
             var productDTOs = _mapper.Map<List<ProductDTO>>(products);
             return Ok(productDTOs);
         }
+        /// <summary>
+        ///     Get best seller products. Used on home page
+        ///     Best seller products are products that are sold the most, or is marked as best seller by admin
+        /// </summary>
+        /// <returns>
+        ///     200: The list of best seller products
+        ///     500: Internal server error if there is an exception
+        /// </returns>
         [HttpGet("bestsellers")]
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetBestSellerProducts()
         {
@@ -160,7 +227,13 @@ namespace ecommerce_api.Controllers
             var productDTOs = _mapper.Map<List<ProductDTO>>(products);
             return Ok(productDTOs);
         }
-        //Return product that has discount price
+        /// <summary>
+        ///   Get deals. Used on home page. Deals are product that have discount price
+        /// </summary>
+        /// <returns>
+        ///     200: The list of deals
+        ///     500: Internal server error if there is an exception
+        /// </returns>
         [HttpGet("deals")]
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetDeals()
         {
@@ -169,7 +242,13 @@ namespace ecommerce_api.Controllers
             return Ok(productDTOs);
         }
 
-
+        /// <summary>
+        ///     Get categories
+        /// </summary>
+        /// <returns>
+        ///     200: The list of categories
+        ///     500: Internal server error if there is an exception
+        /// </returns>
         [HttpGet("categories")]
         public async Task<ActionResult<IEnumerable<CategoryDTO>>> GetCategories()
         {
@@ -177,7 +256,28 @@ namespace ecommerce_api.Controllers
             var categoryDTOs = _mapper.Map<List<CategoryDTO>>(categories);
             return Ok(categoryDTOs);
         }
-
+        /// <summary>
+        /// Create a product. Only admin can create a product
+        /// </summary>
+        /// <param name="productDTO">
+        ///     Name: The name of the product
+        ///     Price: The price of the product
+        ///     Description: The description of the product
+        ///     Colors: The colors of the product
+        ///     StorageOptions: The storage options of the product
+        ///     StorageModifiers: The storage modifiers of the product
+        ///     Images: The images of the product
+        ///     CategoryIds: The categories that the product belongs to
+        ///     ImportPrice: The import price of the product
+        ///     Specifications: The specifications of the product
+        ///     ReleaseDate: The release date of the product
+        /// </param>
+        /// <returns>
+        ///     201: The created product
+        ///     400: Bad request if the product is invalid
+        ///     401: Unauthorized if the user is not an admin
+        ///     500: Internal server error if there is an exception
+        /// </returns>
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ProductDTO>> CreateProduct(CreateProductDTO productDTO)
