@@ -7,7 +7,11 @@ using ecommerce_api.Services;
 using ecommerce_api.Services.Cookies;
 using ecommerce_api.Services.JWT;
 using ecommerce_api.Services.OrderService;
+using ecommerce_api.Services.PaymentService;
 using ecommerce_api.Services.ProductService;
+using ecommerce_api.Services.ShippingService;
+using ecommerce_api.Services.TaxService;
+using ecommerce_api.Services.VoucherService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -92,8 +96,12 @@ builder.Services.AddAutoMapper(typeof(ProductMappingProfile));
 // Services
 builder.Services.AddScoped<PromotionService>();
 builder.Services.AddScoped<IProductService, ProductService>();
-builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ITaxService, TaxService>();
+builder.Services.AddScoped<IShippingService, ShippingService>();
 
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IVoucherService, VoucherService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 var app = builder.Build();
 

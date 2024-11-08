@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
+using ecommerce_api.DTO.Order;
 using ecommerce_api.Models;
+using ecommerce_api.Services.OrderService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,13 +16,16 @@ namespace ecommerce_api.Services.JWT
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly IOrderService _orderService;
 
-        public DatabaseSeeder(AppDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
+        public DatabaseSeeder(AppDbContext context, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager, IOrderService orderService)
         {
             _context = context;
             _userManager = userManager;
             _roleManager = roleManager;
+            _orderService = orderService;
         }
+
         public async Task EnsureRoles()
         {
             if (!await _roleManager.RoleExistsAsync("User"))
@@ -71,7 +76,7 @@ namespace ecommerce_api.Services.JWT
                     Availability = true,
                     Colors = new List<string> { "Pink" },
                     StorageOptions = new List<string> { "512GB" },
-
+                    StorageModifiers = new List<decimal> { 1.0m },
                     Images = new List<string> { "https://res.cloudinary.com/de0lj9ydr/image/upload/v1729943047/phones/hnlcxkzfry9acrntg3fm.jpg",
                     "https://res.cloudinary.com/de0lj9ydr/image/upload/v1729943047/phones/jda4h9zgfxarw86dg69e.jpg" },
                     Description = "Maintaining the modern square design similar to its predecessors, the iPhone 15 Plus is a perfect choice for users who want a balanced size. It’s not too small like the iPhone 15 or overly expensive like the iPhone 15 Pro Max. Additionally, it comes in three storage options: 128GB/256GB/512GB, offering a wide range of choices for iPhone users.",
@@ -87,6 +92,7 @@ namespace ecommerce_api.Services.JWT
                         { "Resolution", "2796 x 1290" },
                         { "Screen Size", "6.7 inches" }
                     })
+
                 };
 
                 //Add products 3 times
@@ -99,7 +105,7 @@ namespace ecommerce_api.Services.JWT
                     Availability = true,
                     Colors = new List<string> { "White", "Green", "Yellow" },
                     StorageOptions = new List<string> { "128GB", "256GB", "512GB" },
-
+                    StorageModifiers = new List<decimal> { 1.0m, 1.1m, 1.2m },
                     Images = new List<string> { "https://res.cloudinary.com/de0lj9ydr/image/upload/v1729943047/phones/hnlcxkzfry9acrntg3fm.jpg",
                     "https://res.cloudinary.com/de0lj9ydr/image/upload/v1729943047/phones/jda4h9zgfxarw86dg69e.jpg" },
                     Description = "Maintaining the modern square design similar to its predecessors, the iPhone 15 Plus is a perfect choice for users who want a balanced size. It’s not too small like the iPhone 15 or overly expensive like the iPhone 15 Pro Max. Additionally, it comes in three storage options: 128GB/256GB/512GB, offering a wide range of choices for iPhone users.",
@@ -127,7 +133,7 @@ namespace ecommerce_api.Services.JWT
                     Availability = true,
                     Colors = new List<string> { "Pink", "Blue", "Yellow" },
                     StorageOptions = new List<string> { "128GB", "256GB", "512GB" },
-
+                    StorageModifiers = new List<decimal> { 1.0m, 1.1m, 1.2m },
                     Images = new List<string> { "https://res.cloudinary.com/de0lj9ydr/image/upload/v1729943047/phones/hnlcxkzfry9acrntg3fm.jpg",
                     "https://res.cloudinary.com/de0lj9ydr/image/upload/v1729943047/phones/jda4h9zgfxarw86dg69e.jpg" },
                     Description = "Maintaining the modern square design similar to its predecessors, the iPhone 15 Plus is a perfect choice for users who want a balanced size. It’s not too small like the iPhone 15 or overly expensive like the iPhone 15 Pro Max. Additionally, it comes in three storage options: 128GB/256GB/512GB, offering a wide range of choices for iPhone users.",
@@ -272,30 +278,61 @@ namespace ecommerce_api.Services.JWT
                 return;
             }
             // Create a new order
-            var order = new Order
+            var order = new CreateOrderDTO
             {
-                UserId = firstUserInDb.Id,
-                OrderDate = DateTime.Now,
-                Status = "Pending",
+                CustomerId = firstUserInDb.Id,
                 PaymentMethod = "Credit Card",
-                OrderDetails = new List<OrderDetail>
-        {
-            new OrderDetail
-            {
-                ProductId = product.Id,
-                Quantity = 2,  // Example quantity
-                Price = effectivePrice
-            }
-        }
+                OrderDetails = new List<CreateOrderDetailDTO>()
+                {
+                    new CreateOrderDetailDTO
+                    {
+                    ProductId = product.Id,
+                    Quantity = 2,  // Example quantity
+                    Storage = product.StorageOptions[2],
+                    Color = product.Colors[1],
+                    StorageModifier = product.StorageModifiers[2],
+                    }
+                },
+                Address = "1234 Main St",
+                Province = "Ontario",
+                District = "Toronto",
+                PhoneNumber = "1234567890",
+                ShippingMethod = "Standard",
+                CardCvv = "123",
+                CardExpireDate = "12/25",
+                CardHolder = "John Doe",
+                CardNumber = "1234567890123456",
+
             };
 
-            // Add the order to the context
-            context.Orders.Add(order);
+
+            var orderRes = await _orderService.CreateOrderAsync(order);
 
             // Save changes to the database
             await context.SaveChangesAsync();
-
-            Console.WriteLine($"Order created successfully with ID {order.Id} and TotalPrice {order.TotalPrice}");
+            await SeedVoucher();
+            Console.WriteLine($"Order created successfully with ID {orderRes.Id} with total {orderRes.Total}, sub total {orderRes.SubTotal}");
         }
+        public async Task SeedVoucher()
+        {
+            if (await _context.Vouchers.CountAsync() == 0)
+            {
+                var voucher = new Voucher
+                {
+                    Code = "V12345",
+                    Name = "50% off christmas",
+                    DiscountPercentage = 50,
+                    ExpiryDate = DateTime.Now.AddMonths(1),
+                    IsActive = true,
+                    Description = "50% off for all products",
+                };
+                await _context.Vouchers.AddAsync(voucher);
+                await _context.SaveChangesAsync();
+            }
+        }
+
+
+
+
     }
 }
