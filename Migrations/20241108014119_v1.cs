@@ -29,8 +29,9 @@ namespace ecommerce_api.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -72,7 +73,21 @@ namespace ecommerce_api.Migrations
                     UserId = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     OrderDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    PaymentMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Province = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    District = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ShippingMethod = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ShippingFee = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TrackingID = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Tax = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    CardNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CardHolder = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CardExpireDate = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CardCvv = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PromoCodeApplied = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PromoCodeDiscount = table.Column<decimal>(type: "decimal(18,2)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -203,6 +218,31 @@ namespace ecommerce_api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Vouchers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DiscountPercentage = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExpiryDate = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "DATEADD(month, 1, getdate())"),
+                    IsUsed = table.Column<bool>(type: "bit", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Vouchers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Vouchers_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Products",
                 columns: table => new
                 {
@@ -216,6 +256,7 @@ namespace ecommerce_api.Migrations
                     ImportPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
                     Colors = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StorageOptions = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StorageModifiers = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Images = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     SpecificationsJson = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -245,7 +286,10 @@ namespace ecommerce_api.Migrations
                     OrderId = table.Column<int>(type: "int", nullable: false),
                     ProductId = table.Column<int>(type: "int", nullable: false),
                     Quantity = table.Column<int>(type: "int", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
+                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Color = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Storage = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StorageModifier = table.Column<decimal>(type: "decimal(18,2)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -346,6 +390,11 @@ namespace ecommerce_api.Migrations
                 name: "IX_Products_PromotionId",
                 table: "Products",
                 column: "PromotionId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Vouchers_UserId",
+                table: "Vouchers",
+                column: "UserId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -372,10 +421,10 @@ namespace ecommerce_api.Migrations
                 name: "ProductCategories");
 
             migrationBuilder.DropTable(
-                name: "AspNetRoles");
+                name: "Vouchers");
 
             migrationBuilder.DropTable(
-                name: "AspNetUsers");
+                name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Orders");
@@ -385,6 +434,9 @@ namespace ecommerce_api.Migrations
 
             migrationBuilder.DropTable(
                 name: "Products");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "Promotions");

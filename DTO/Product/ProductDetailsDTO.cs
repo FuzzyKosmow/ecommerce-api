@@ -6,7 +6,9 @@ using ecommerce_api.DTO.Category;
 using ecommerce_api.Models;
 
 namespace ecommerce_api.DTO.Product
-{
+{   /// <summary>
+/// Data Transfer Object for Product Details used on details page
+/// </summary>
     public class ProductDetailsDTO
     {
         public int Id { get; set; }
@@ -16,6 +18,7 @@ namespace ecommerce_api.DTO.Product
         public List<string> Images { get; set; }
         public List<string> Colors { get; set; }
         public List<string> Storage { get; set; }
+        public List<decimal> StorageModifiers { get; set; }
         public Dictionary<string, string> Specifications { get; set; }
         public string Description { get; set; }
         public decimal Rating { get; set; }

@@ -8,7 +8,9 @@ using ecommerce_api.Models;
 
 namespace ecommerce_api.DTO.Product
 {
-
+    /// <summary>
+    /// Data Transfer Object for Product used on product listing page, general filter page
+    /// </summary>
     public class ProductDTO
     {
 
@@ -19,6 +21,7 @@ namespace ecommerce_api.DTO.Product
         public string Image { get; set; }
         public List<string> Colors { get; set; }
         public List<string> Storage { get; set; }
+        public List<decimal> StorageModifiers { get; set; }
         // Implement rating later
         public decimal Rating { get; set; }
         public List<CategoryDTO> Categories { get; set; }

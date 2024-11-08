@@ -15,6 +15,7 @@ namespace ecommerce_api.DTO.Product
         public decimal? ImportPrice { get; set; }
         public List<string>? Colors { get; set; }
         public List<string>? StorageOptions { get; set; }
+        public List<decimal>? StorageModifiers { get; set; }
         public List<string>? Images { get; set; }
         public string? Description { get; set; }
         public Dictionary<string, string>? Specifications { get; set; }

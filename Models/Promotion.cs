@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace ecommerce_api.Models
 {
+    /// <summary>
+    ///  Used to manage discount applied to products, reflect in discount price. Different from promo code aka coupon
+    /// </summary>
     public class Promotion
     {
         public int Id { get; set; }

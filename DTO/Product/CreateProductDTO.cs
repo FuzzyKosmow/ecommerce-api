@@ -12,6 +12,7 @@ namespace ecommerce_api.DTO.Product
         public decimal Price { get; set; }
         public string[] Colors { get; set; }
         public string[] StorageOptions { get; set; }
+        public decimal[] StorageModifiers { get; set; }
         public string[] Images { get; set; }
         public List<int> CategoryIds { get; set; }
         public decimal ImportPrice { get; set; }

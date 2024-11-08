@@ -39,7 +39,8 @@ namespace ecommerce_api.Profiles
                 .ForMember(dest => dest.Is_bestseller, opt => opt.MapFrom(src => src.IsBestSeller))
                 .ForMember(dest => dest.Is_featured, opt => opt.MapFrom(src => src.IsFeatured))
                 .ForMember(dest => dest.Is_new_arrival, opt => opt.MapFrom(src => src.IsNewArrival))
-                .ForMember(dest => dest.Release_date, opt => opt.MapFrom(src => src.ReleaseDate));
+                .ForMember(dest => dest.Release_date, opt => opt.MapFrom(src => src.ReleaseDate))
+                .ForMember(dest => dest.StorageModifiers, opt => opt.MapFrom(src => src.StorageModifiers));
 
 
             // Product -> ProductDTO
@@ -62,7 +63,8 @@ namespace ecommerce_api.Profiles
                 .ForMember(dest => dest.Is_bestseller, opt => opt.MapFrom(src => src.IsBestSeller))
                 .ForMember(dest => dest.Is_featured, opt => opt.MapFrom(src => src.IsFeatured))
                 .ForMember(dest => dest.Is_new_arrival, opt => opt.MapFrom(src => src.IsNewArrival))
-                .ForMember(dest => dest.Release_date, opt => opt.MapFrom(src => src.ReleaseDate));
+                .ForMember(dest => dest.Release_date, opt => opt.MapFrom(src => src.ReleaseDate))
+                .ForMember(dest => dest.StorageModifiers, opt => opt.MapFrom(src => src.StorageModifiers));
 
 
             //Create ProductDTO -> Product
@@ -75,7 +77,8 @@ namespace ecommerce_api.Profiles
                 .ForMember(dest => dest.Description, opt => opt.MapFrom(src => src.Description))
                 .ForMember(dest => dest.ImportPrice, opt => opt.MapFrom(src => src.ImportPrice))
                 .ForMember(dest => dest.Specifications, opt => opt.MapFrom(src => src.Specifications))
-                .ForMember(dest => dest.ReleaseDate, opt => opt.MapFrom(src => src.ReleaseDate));
+                .ForMember(dest => dest.ReleaseDate, opt => opt.MapFrom(src => src.ReleaseDate))
+                .ForMember(dest => dest.StorageModifiers, opt => opt.MapFrom(src => src.StorageModifiers));
 
             CreateMap<UpdateProductDTO, Product>()
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));

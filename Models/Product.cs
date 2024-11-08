@@ -19,6 +19,9 @@ namespace ecommerce_api.Models
         public decimal ImportPrice { get; set; }
         public List<string> Colors { get; set; }
         public List<string> StorageOptions { get; set; }
+        // Final price of product is calculated by Price * StoragePriceModifiers[StorageOptions.IndexOf(SelectedStorage)]
+        // The modifier should be bigger than 1.0. And is default to 1.0
+        public List<decimal> StorageModifiers { get; set; }
         public List<string> Images { get; set; }
 
 
