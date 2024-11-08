@@ -20,6 +20,7 @@ namespace ecommerce_api.Controllers
         public readonly string ORDER_STATUS_CANCELLED = "CANCELLED";
         public readonly string ORDER_STATUS_DELIVERED = "DELIVERED";
 
+        public readonly decimal TAX_RATE = 0.1m;
 
         private readonly AppDbContext _context;
         private readonly IOrderService _orderService;
@@ -161,6 +162,13 @@ namespace ecommerce_api.Controllers
             order.Status = ORDER_STATUS_CANCELLED;
             await _context.SaveChangesAsync();
             return Ok(order);
+        }
+
+        //Get tax rate
+        [HttpGet("tax-rate")]
+        public IActionResult GetTaxRate()
+        {
+            return Ok(new { taxRate = TAX_RATE });
         }
 
 
