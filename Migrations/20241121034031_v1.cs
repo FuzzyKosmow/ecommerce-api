@@ -29,6 +29,8 @@ namespace ecommerce_api.Migrations
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FullName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Province = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    District = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false),
@@ -254,6 +256,7 @@ namespace ecommerce_api.Migrations
                     Rating = table.Column<float>(type: "real", nullable: false),
                     Availability = table.Column<bool>(type: "bit", nullable: false),
                     ImportPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Stock = table.Column<int>(type: "int", nullable: false),
                     Colors = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StorageOptions = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StorageModifiers = table.Column<string>(type: "nvarchar(max)", nullable: false),

@@ -17,6 +17,10 @@ namespace ecommerce_api.Models
         public bool Availability { get; set; }
         [DefaultValue(0)]
         public decimal ImportPrice { get; set; }
+
+        [DefaultValue(0)]
+        public int Stock { get; set; }
+
         public List<string> Colors { get; set; }
         public List<string> StorageOptions { get; set; }
         // Final price of product is calculated by Price * StoragePriceModifiers[StorageOptions.IndexOf(SelectedStorage)]

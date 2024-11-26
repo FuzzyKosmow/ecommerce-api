@@ -23,7 +23,7 @@ namespace ecommerce_api.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IMapper _mapper;
-        private readonly int defaultDayCountAsNewArrival = 7;
+
 
         public ProductsController(AppDbContext context, IMapper mapper)
         {
@@ -73,7 +73,7 @@ namespace ecommerce_api.Controllers
     [FromQuery] decimal? price_max,
     [FromQuery] string? color,
     [FromQuery] string? storage,
-    [FromQuery] string? sort,
+    [FromQuery] string? sort, // Can be 4 values : "price-high-to-low", "price-low-to-high", "most-popular", "newest-arrivals"
     [FromQuery] int page = 1,
     [FromQuery] int limit = 10)
         {
@@ -81,10 +81,12 @@ namespace ecommerce_api.Controllers
                 .Include(p => p.Categories)
                 .AsQueryable();
 
-            // Filter by category
+
             if (!string.IsNullOrEmpty(category))
             {
-                query = query.Where(p => p.Categories.Any(c => c.Name.ToLower() == category.ToLower()));
+                var categoryList = category.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
+
+                query = query.Where(p => p.Categories.Any(c => categoryList.Contains(c.Name.ToLower())));
             }
 
             // Filter by keyword
@@ -127,17 +129,22 @@ namespace ecommerce_api.Controllers
             // Sorting
             switch (sort)
             {
-                case "price_asc":
-                    productList = productList.OrderBy(p => p.Price).ToList();
+                case "price-high-to-low":
+                    // Compare price1, if discount price is not null or > 0 , then price1 = discount price, else price1 = price
+                    productList = productList.OrderByDescending(p => p.DiscountPrice != null && p.DiscountPrice > 0 ? p.DiscountPrice : p.Price).ToList();
                     break;
-                case "price_desc":
+                case "price-low-to-high":
+                    // Similar to above
+                    productList = productList.OrderBy(p => p.DiscountPrice != null && p.DiscountPrice > 0 ? p.DiscountPrice : p.Price).ToList();
+                    break;
+                case "most-popular":
+                    // Todo: Implement a better way to calculate the most popular products
                     productList = productList.OrderByDescending(p => p.Price).ToList();
                     break;
-                case "discount":
-                    productList = productList
-                        .Where(p => p.DiscountPrice.HasValue)
-                        .OrderBy(p => p.DiscountPrice)
-                        .ToList();
+                case "newest-arrivals":
+                    productList = productList.OrderByDescending(p => p.ReleaseDate).ToList();
+                    break;
+                default:
                     break;
             }
 
@@ -256,6 +263,104 @@ namespace ecommerce_api.Controllers
             var categoryDTOs = _mapper.Map<List<CategoryDTO>>(categories);
             return Ok(categoryDTOs);
         }
+
+        // Same as normal search, but for admin, return AdminProductDTO which has more details
+        [HttpGet("admin-get")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<List<Product>>> GetProductsAdmin(
+                [FromQuery] string? category,
+    [FromQuery] string? keyword,
+    [FromQuery] decimal? price_min,
+    [FromQuery] decimal? price_max,
+    [FromQuery] string? color,
+    [FromQuery] string? storage,
+    [FromQuery] string? sort, // Can be 4 values : "price-high-to-low", "price-low-to-high", "most-popular", "newest-arrivals"
+    [FromQuery] int page = 1,
+    [FromQuery] int limit = 10)
+        {
+            var query = _context.Products
+                   .Include(p => p.Categories)
+                   .AsQueryable();
+
+
+            if (!string.IsNullOrEmpty(category))
+            {
+                var categoryList = category.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
+
+                query = query.Where(p => p.Categories.Any(c => categoryList.Contains(c.Name.ToLower())));
+            }
+
+            // Filter by keyword
+            if (!string.IsNullOrEmpty(keyword))
+            {
+                query = query.Where(p => p.Name.ToLower().Contains(keyword.ToLower()));
+            }
+
+            // Filter by price range
+            if (price_min.HasValue)
+            {
+                query = query.Where(p => p.Price >= price_min);
+            }
+            if (price_max.HasValue)
+            {
+                query = query.Where(p => p.Price <= price_max);
+            }
+
+            // Fetch data from database, then filter colors and storage on the client side
+            var productList = await query.AsNoTracking().ToListAsync();
+
+            // Filter by color(s)
+            if (!string.IsNullOrEmpty(color))
+            {
+                var colorList = color.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
+                productList = productList
+                    .Where(p => p.Colors.Any(c => colorList.Contains(c.ToLower())))
+                    .ToList();
+            }
+
+            // Filter by storage option(s)
+            if (!string.IsNullOrEmpty(storage))
+            {
+                var storageList = storage.Split(',', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries).ToList();
+                productList = productList
+                    .Where(p => p.StorageOptions.Any(s => storageList.Contains(s.ToLower())))
+                    .ToList();
+            }
+
+            // Sorting
+            switch (sort)
+            {
+                case "price-high-to-low":
+                    // Compare price1, if discount price is not null or > 0 , then price1 = discount price, else price1 = price
+                    productList = productList.OrderByDescending(p => p.DiscountPrice != null && p.DiscountPrice > 0 ? p.DiscountPrice : p.Price).ToList();
+                    break;
+                case "price-low-to-high":
+                    // Similar to above
+                    productList = productList.OrderBy(p => p.DiscountPrice != null && p.DiscountPrice > 0 ? p.DiscountPrice : p.Price).ToList();
+                    break;
+                case "most-popular":
+                    // Todo: Implement a better way to calculate the most popular products
+                    productList = productList.OrderByDescending(p => p.Price).ToList();
+                    break;
+                case "newest-arrivals":
+                    productList = productList.OrderByDescending(p => p.ReleaseDate).ToList();
+                    break;
+                default:
+                    break;
+            }
+
+            // Pagination
+            var pagedProducts = productList
+                .Skip((page - 1) * limit)
+                .Take(limit)
+                .ToList();
+
+
+
+            return Ok(pagedProducts);
+
+        }
+
         /// <summary>
         /// Create a product. Only admin can create a product
         /// </summary>
@@ -279,7 +384,6 @@ namespace ecommerce_api.Controllers
         ///     500: Internal server error if there is an exception
         /// </returns>
         [HttpPost]
-        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<ProductDTO>> CreateProduct(CreateProductDTO productDTO)
         {
             var product = _mapper.Map<Product>(productDTO);
@@ -297,7 +401,61 @@ namespace ecommerce_api.Controllers
             return CreatedAtAction(nameof(GetProduct), new { id = product.Id }, productDTOToReturn);
         }
 
+        [HttpPut("{id}")]
+        public async Task<ActionResult<ProductDTO>> UpdateProduct(int id, UpdateProductDTO productDTO)
+        {
+            var product = await _context.Products.Include(p => p.Categories).FirstOrDefaultAsync(p => p.Id == id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+            _mapper.Map(productDTO, product);
+            _context.Entry(product).Property(p => p.Colors).IsModified = true;
+            _context.Entry(product).Property(p => p.StorageOptions).IsModified = true;
+            _context.Entry(product).Property(p => p.StorageModifiers).IsModified = true;
+            _context.Entry(product).Property(p => p.Images).IsModified = true;
+
+            Console.WriteLine("Best seller status: " + product.IsBestSeller);
+
+
+            var currentCategoryIds = product.Categories.Select(c => c.Id).ToList();
+
+            // Compare with the incoming category IDs from productDTO
+            var newCategoryIds = productDTO.CategoryIds ?? new List<int>();
+            // Only update categories if there are changes
+            if (!currentCategoryIds.SequenceEqual(newCategoryIds))
+            {
+                // Get the categories to be associated with this product
+                var categories = await _context.Categories
+                    .Where(c => newCategoryIds.Contains(c.Id))
+                    .ToListAsync();
+
+                // Update the product's categories
+                product.Categories = categories;
+            }
+
+            await _context.SaveChangesAsync();
+
+            var productDTOToReturn = _mapper.Map<ProductDTO>(product);
+            Console.WriteLine("Best seller status after update: " + product.IsBestSeller);
+            return Ok(productDTOToReturn);
+        }
+
+
+        [HttpDelete("{id}")]
+
+        public async Task<ActionResult> DeleteProduct(int id)
+        {
+            var product = await _context.Products.FirstOrDefaultAsync(p => p.Id == id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+            _context.Products.Remove(product);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
 
     }
-
 }

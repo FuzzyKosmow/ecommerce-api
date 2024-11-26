@@ -14,10 +14,9 @@ namespace ecommerce_api.Profiles
         {
             // Transit object
             CreateMap<ApplicationUser, UserDto>()
-                .ForMember(dest => dest.FullName, opt => opt.MapFrom(src => src.FullName))
-                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.Address))
-                .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.PhoneNumber))
-                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.Email));
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+
+
 
             // Register object
             CreateMap<RegisterUserDto, ApplicationUser>()

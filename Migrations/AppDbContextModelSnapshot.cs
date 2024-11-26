@@ -313,6 +313,9 @@ namespace ecommerce_api.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("Stock")
+                        .HasColumnType("int");
+
                     b.Property<string>("StorageModifiers")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

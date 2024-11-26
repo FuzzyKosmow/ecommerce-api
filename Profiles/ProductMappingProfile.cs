@@ -80,8 +80,15 @@ namespace ecommerce_api.Profiles
                 .ForMember(dest => dest.ReleaseDate, opt => opt.MapFrom(src => src.ReleaseDate))
                 .ForMember(dest => dest.StorageModifiers, opt => opt.MapFrom(src => src.StorageModifiers));
 
+            //Update ProductDTO -> Product
             CreateMap<UpdateProductDTO, Product>()
-                .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
+                // Ignore Categories, for the rest, update if not null
+                .ForMember(dest => dest.Categories, opt => opt.Ignore())
+                .ForAllMembers(opt => opt.Condition((src, dest, srcMember) => srcMember != null));
+
+
+
+
         }
     }
 }

@@ -12,8 +12,8 @@ using ecommerce_api;
 namespace ecommerce_api.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241108134145_v2")]
-    partial class v2
+    [Migration("20241121034031_v1")]
+    partial class v1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -314,6 +314,9 @@ namespace ecommerce_api.Migrations
                     b.Property<string>("SpecificationsJson")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Stock")
+                        .HasColumnType("int");
 
                     b.Property<string>("StorageModifiers")
                         .IsRequired()

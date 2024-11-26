@@ -47,7 +47,10 @@ namespace ecommerce_api
                 .UsingEntity(j => j.ToTable("ProductCategories"));
             modelBuilder.Entity<Product>()
                     .Ignore(p => p.Specifications);
-
+            // Set default discount = 0;
+            modelBuilder.Entity<Product>()
+                .Property(p => p.DiscountPrice)
+                .HasDefaultValue(0.0m);
             modelBuilder.Entity<Product>()
                 .Property(p => p.Colors)
                 .HasConversion(
