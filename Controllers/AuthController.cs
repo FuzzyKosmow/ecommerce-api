@@ -118,8 +118,11 @@ namespace ecommerce_api.Controllers
         public async Task<IActionResult> Me()
         {
             var user = await _userManager.FindByEmailAsync(User.Identity.Name);
+            var role = await _userManager.GetRolesAsync(user);
+            var userDto = _mapper.Map<UserDto>(user);
+            userDto.Role = role.FirstOrDefault();
             //Todo: Implement get total orders and related purchase information
-            return Ok(_mapper.Map<UserDto>(user));
+            return Ok(userDto);
         }
 
     }

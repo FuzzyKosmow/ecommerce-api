@@ -13,6 +13,7 @@ namespace ecommerce_api.DTO.Product
         public float? Rating { get; set; }
         public bool? Availability { get; set; }
         public decimal? ImportPrice { get; set; }
+        public int Stock { get; set; }
         public List<string>? Colors { get; set; }
         public List<string>? StorageOptions { get; set; }
         public List<decimal>? StorageModifiers { get; set; }
@@ -23,5 +24,7 @@ namespace ecommerce_api.DTO.Product
         public bool? IsFeatured { get; set; }
         public DateTime? ReleaseDate { get; set; }
         public bool? IsNewArrival { get; set; }
+
+        public List<int>? CategoryIds { get; set; }
     }
 }
