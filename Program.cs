@@ -20,7 +20,7 @@ using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 // Mark variable to use in memory database
-var useInMem = true;
+var useInMem = false;
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(
     options =>
@@ -49,6 +49,7 @@ if (useInMem)
     builder.Services.AddDbContext<AppDbContext>(options =>
     {
         options.UseInMemoryDatabase("EcommerceApi");
+        options.EnableSensitiveDataLogging();
     });
 }
 else
@@ -58,10 +59,6 @@ else
         options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
     });
 }
-builder.Services.AddDbContext<AppDbContext>(options =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-});
 
 
 // JSON Serialization settings

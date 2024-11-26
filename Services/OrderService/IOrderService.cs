@@ -19,5 +19,6 @@ namespace ecommerce_api.Services.OrderService
 
         Task<List<Order>?> GetOrderFromCustomer(string customerId, int page, int limit);
         Task<List<Order>?> GetOrderFromCustomerEmail(string email, int page, int limit);
+        Task<decimal> TotalValueFromCustomer(string customerId);
     }
 }

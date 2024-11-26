@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authorization;
 using ecommerce_api.DTO.User;
 using System.Security.Claims;
+using ecommerce_api.Services.OrderService;
 namespace ecommerce_api.Controllers
 {
     /// <summary>
@@ -20,10 +21,12 @@ namespace ecommerce_api.Controllers
     {
         private readonly AppDbContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
-        public UserController(AppDbContext context, UserManager<ApplicationUser> userManager)
+        private readonly IOrderService _orderService;
+        public UserController(AppDbContext context, UserManager<ApplicationUser> userManager, IOrderService orderService)
         {
             _context = context;
             _userManager = userManager;
+            _orderService = orderService;
         }
         /// <summary>
         /// Get a list of users. Only admin can access this endpoint
@@ -173,6 +176,8 @@ namespace ecommerce_api.Controllers
                 return NotFound();
             }
 
+            // Todo: Add automatic mapper/ conditions for updating user
+
             if (updateUserDTO.FullName != null && updateUserDTO.FullName.Length > 0)
             {
                 user.FullName = updateUserDTO.FullName;
@@ -186,9 +191,64 @@ namespace ecommerce_api.Controllers
                 user.PhoneNumber = updateUserDTO.PhoneNumber;
             }
 
+            if (updateUserDTO.Province != null && updateUserDTO.Province.Length > 0)
+            {
+                user.Province = updateUserDTO.Province;
+            }
+            if (updateUserDTO.District != null && updateUserDTO.District.Length > 0)
+            {
+                user.District = updateUserDTO.District;
+            }
+
+
             await _userManager.UpdateAsync(user);
             return Ok(user);
 
         }
+        // Get all users. Have pagination support.
+        // Search using fullname or email
+        [HttpGet("search")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> GetUsers(
+            [FromQuery] int page = 1,
+            [FromQuery] int limit = 10,
+            [FromQuery] string email = "",
+            [FromQuery] string fullname = ""
+        )
+        {
+            var users = _userManager.Users.Where(u => u.Email.Contains(email) && u.FullName.Contains(fullname)).Skip((page - 1) * limit).Take(limit).ToList();
+            var userDtos = await AssignTotalOrdersAndTotalValue(users);
+            return Ok(userDtos);
+        }
+        // Utils function to assign TotalOrders and TotalValue to a user. Accept an array of users
+        private async Task<List<UserDto>> AssignTotalOrdersAndTotalValue(List<ApplicationUser> users)
+        {
+            var userDtos = new List<UserDto>();
+            foreach (var user in users)
+            {
+                var role = await _userManager.GetRolesAsync(user);
+                decimal totalValue = await _orderService.TotalValueFromCustomer(user.Id);
+                //Todo: update auto mapper
+                var userDto = new UserDto
+                {
+                    Id = user.Id,
+                    FullName = user.FullName,
+                    Address = user.Address,
+                    PhoneNumber = user.PhoneNumber,
+                    Email = user.Email,
+                    Role = role.FirstOrDefault(),
+                    District = user.District,
+                    Province = user.Province,
+
+                    TotalOrders = _context.Orders.Where(o => o.UserId == user.Id).Count(),
+                    TotalValue = (double?)totalValue
+                };
+                userDtos.Add(userDto);
+            }
+            return userDtos;
+        }
     }
+
+
+
 }

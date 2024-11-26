@@ -201,5 +201,16 @@ namespace ecommerce_api.Services.OrderService
             }
             return await GetOrderFromCustomer(user.Id, page, limit);
         }
+
+        public async Task<decimal> TotalValueFromCustomer(string id)
+        {
+            var orders = await GetOrderFromCustomer(id);
+            if (orders == null)
+            {
+                return 0;
+            }
+            return orders.Sum(o => o.Total);
+        }
+
     }
 }

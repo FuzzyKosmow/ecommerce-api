@@ -74,6 +74,7 @@ namespace ecommerce_api.Services.JWT
                     DiscountPrice = 0,
                     Rating = 4.5f,
                     Availability = true,
+                    Stock = 1,
                     Colors = new List<string> { "Pink" },
                     StorageOptions = new List<string> { "512GB" },
                     StorageModifiers = new List<decimal> { 1.0m },
@@ -103,6 +104,7 @@ namespace ecommerce_api.Services.JWT
                     DiscountPrice = 0,
                     Rating = 4.5f,
                     Availability = true,
+                    Stock = 1,
                     Colors = new List<string> { "White", "Green", "Yellow" },
                     StorageOptions = new List<string> { "128GB", "256GB", "512GB" },
                     StorageModifiers = new List<decimal> { 1.0m, 1.1m, 1.2m },
@@ -131,6 +133,7 @@ namespace ecommerce_api.Services.JWT
                     DiscountPrice = 28890000,
                     Rating = 4.5f,
                     Availability = true,
+                    Stock = 1,
                     Colors = new List<string> { "Pink", "Blue", "Yellow" },
                     StorageOptions = new List<string> { "128GB", "256GB", "512GB" },
                     StorageModifiers = new List<decimal> { 1.0m, 1.1m, 1.2m },
@@ -154,7 +157,108 @@ namespace ecommerce_api.Services.JWT
 
                 };
 
-                await _context.Products.AddRangeAsync(sampleProduct, sample2, sample3);
+
+                var sample4 = new Product
+                {
+                    Name = "Xiaomi Poco M6 Pro",
+                    Price = 30890000,
+                    DiscountPrice = 28890000,
+                    Rating = 4.5f,
+                    Availability = true,
+                    Stock = 1,
+                    Colors = new List<string> { "Black", "Blue" },
+                    StorageOptions = new List<string> { "64GB", "128GB" },
+                    StorageModifiers = new List<decimal> { 1.0m, 1.2m },
+                    Images = new List<string> { "https://res.cloudinary.com/de0lj9ydr/image/upload/v1732086765/phones/rsuka5u55auiyhrtlqhi.jpg",
+                    "https://res.cloudinary.com/de0lj9ydr/image/upload/v1732086765/phones/wa5azmbshkqe8aq2shgs.jpg",
+                    "https://res.cloudinary.com/de0lj9ydr/image/upload/v1732086765/phones/grypgpq3mxkmqiopwxza.png",
+                    "https://res.cloudinary.com/de0lj9ydr/image/upload/v1732086766/phones/enkilne7lfpfslbathks.png" },
+                    Description = "The Xiaomi Poco M6 Pro features a powerful Snapdragon 4 Gen 1 processor, a 6.79-inch display, 50MP dual camera, 5000mAh battery, and more.",
+                    SpecificationsJson = JsonSerializer.Serialize(new Dictionary<string, string>
+                    {
+                        { "Processor", "Snapdragon 4 Gen 1" },
+                        { "Display", "6.79 inches" },
+                        { "Battery", "5000mAh" },
+                        { "Camera", "50MP dual" }
+                    }),
+                    ReleaseDate = new DateTime(2023, 8, 5),
+                    CreatedAt = DateTime.Now,
+                    IsNewArrival = true
+                };
+
+
+
+
+
+
+                var vivo = new Product
+                {
+                    Name = "Vivo Y36",
+                    Price = 8990000,
+                    DiscountPrice = 0,
+                    Rating = 4.3f,
+                    Availability = true,
+                    Stock = 1,
+                    Colors = new List<string> { "Black", "Gold" },
+                    StorageOptions = new List<string> { "128GB" },
+                    StorageModifiers = new List<decimal> { 1.0m },
+                    Images = new List<string> { "https://res.cloudinary.com/de0lj9ydr/image/upload/v1732090350/phones/bclm1g5oc9xpgsqtl0hx.webp",
+                    "https://res.cloudinary.com/de0lj9ydr/image/upload/v1732090350/phones/b8m6bzgm2tzskrobqjme.webp",
+                    "https://res.cloudinary.com/de0lj9ydr/image/upload/v1732090350/phones/ukysjhzxc15gp0siditt.webp"
+                    },
+                    Description = "The Vivo Y36 is a budget-friendly smartphone offering a sleek design and robust features for everyday users. It comes with a 6.64-inch display that provides a vivid and immersive viewing experience. Powered by the Snapdragon 680 processor, the Vivo Y36 is engineered for efficiency and smooth multitasking. Its triple-camera system allows users to capture stunning photos, while the 5000mAh battery ensures that you stay powered throughout the day. This phone also supports 44W FlashCharge, meaning you can recharge in a snap when needed. Other notable features include facial recognition, a side-mounted fingerprint scanner, and dual SIM functionality. It is an excellent choice for users looking for an all-around performer with a focus on essential smartphone experiences.",
+                    SpecificationsJson = JsonSerializer.Serialize(new Dictionary<string, string>
+                    {
+                        { "Display", "6.64-inch FHD+" },
+                        { "Processor", "Snapdragon 680" },
+                        { "RAM", "8GB" },
+                        { "Battery", "5000mAh" },
+                        { "Charging", "44W FlashCharge" },
+                        { "OS", "Android 13" }
+                    }),
+                    IsBestSeller = true,
+                    ReleaseDate = new DateTime(2024, 10, 12),
+                    CreatedAt = DateTime.Now,
+                    IsNewArrival = true
+                };
+                var realme13 = new Product
+                {
+                    Name = "Realme 13",
+                    Price = 19990000,
+                    Rating = 4.5f,
+                    Availability = true,
+                    DiscountPrice = 0,
+                    ImportPrice = 15000000,
+                    Colors = new List<string> { "Silver", "Blue", "Black" }, // Available colors
+                    StorageOptions = new List<string> { "128GB", "256GB" }, // Storage options
+                    StorageModifiers = new List<decimal> { 1.0m, 1.2m }, // Storage price modifiers
+                    Images = new List<string>
+    {
+        "https://res.cloudinary.com/de0lj9ydr/image/upload/v1732091392/phones/efcugqlsuehnwno28kxc.webp",
+        "https://res.cloudinary.com/de0lj9ydr/image/upload/v1732091392/phones/e58ednlyix3acngncaax.webp",
+        "https://res.cloudinary.com/de0lj9ydr/image/upload/v1732091392/phones/qmudw17x7hgfcojefprq.webp",
+        "https://res.cloudinary.com/de0lj9ydr/image/upload/v1732091392/phones/zbroyrsihhgjh0fytrov.webp"
+    },
+                    Description = "The Realme 13 is a cutting-edge smartphone that combines advanced technology with an elegant design. Featuring a 6.7-inch Super AMOLED display with a 120Hz refresh rate, this device provides an immersive viewing experience. Powered by the MediaTek Dimensity 9200 processor, it ensures blazing-fast performance and smooth multitasking. The Realme 13 is equipped with a versatile triple-camera setup, allowing you to capture stunning photos and videos in various conditions. Its 5000mAh battery supports 67W SuperDart charging, giving you more usage time with less downtime. Additionally, the phone includes dual stereo speakers, an in-display fingerprint scanner, and runs on Realme UI 5.0 based on Android 14. Whether you’re gaming, streaming, or working, the Realme 13 is built to exceed expectations.",
+                    Specifications = new Dictionary<string, string>
+    {
+        { "Display", "6.7-inch Super AMOLED, 120Hz" },
+        { "Processor", "MediaTek Dimensity 9200" },
+        { "RAM", "12GB" },
+        { "Battery", "5000mAh" },
+        { "Charging", "67W SuperDart" },
+        { "OS", "Android 14" },
+        { "Audio", "Dual stereo speakers" }
+    },
+                    IsBestSeller = true, // Marked as bestseller
+                    IsFeatured = true, // Featured product
+                    ReleaseDate = new DateTime(2024, 11, 5), // Release date
+                    CreatedAt = DateTime.Now, // Automatically set to current time
+                    IsNewArrival = true // Marked as a new arrival
+                };
+
+
+                await _context.Products.AddRangeAsync(sampleProduct, sample2, sample3, sample4, vivo, realme13);
                 await _context.SaveChangesAsync();
 
                 // Assign random categories to each product
