@@ -7,13 +7,13 @@ namespace ecommerce_api.Services.ShippingService
 {
     public class ShippingService : IShippingService
     {
-        private readonly List<string> shippingMethods = new List<string> { "Standard", "Fast", "Super Fast" };
+        private readonly List<string> shippingMethods = new List<string> { "Standard", "Fast", "SuperFast" };
         private readonly Dictionary<string, decimal> shippingCosts = new Dictionary<string, decimal>
         {
             //In VND
             { "Standard", 20000 },
             { "Fast", 40000 },
-            { "Super Fast", 60000 }
+            { "SuperFast", 60000 }
         };
         public async Task<decimal> CalculateShippingCost(string province, string district, string address, string method)
         {

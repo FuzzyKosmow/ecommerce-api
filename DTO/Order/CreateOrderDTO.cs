@@ -11,6 +11,7 @@ namespace ecommerce_api.DTO.Order
     public class CreateOrderDTO
     {
         public string? CustomerId { get; set; }
+        public string CustomerName { get; set; }
         public string Province { get; set; }
         public string District { get; set; }
         public string Address { get; set; }

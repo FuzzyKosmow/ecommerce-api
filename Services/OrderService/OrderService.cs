@@ -45,7 +45,7 @@ namespace ecommerce_api.Services.OrderService
                 UserId = order.CustomerId,
                 Status = "Pending",
                 OrderDate = DateTime.Now,
-
+                CustomerName = order.CustomerName,  
                 // Contact props
                 Address = order.Address,
                 Province = order.Province,

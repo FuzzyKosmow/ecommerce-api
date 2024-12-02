@@ -81,20 +81,32 @@ namespace ecommerce_api.Controllers
         ///     400: Bad request if the order is invalid. Including missing fields, invalid product or quantity, etc.
         /// </returns>
         [HttpPost]
-        [Authorize(Roles = "User")]
         public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDTO order)
         {
             // Try to assign the current user's email to the order
-            var user = await _userManager.FindByEmailAsync(User.Identity.Name);
-            if (user == null)
+            if (User.Identity.Name == null)
             {
-                return BadRequest(new { message = "User not found" });
+                Console.WriteLine("WARN: User not found. Order will be created without user ID");  
+                order.CustomerId = null;
             }
-            order.CustomerId = user.Id;
+            else {
+                var user = await _userManager.FindByEmailAsync(User.Identity.Name);
+                if (user == null)
+                {
+                    Console.WriteLine("WARN: User not found. Order will be created without user ID");
+                    order.CustomerId = null;
+                }
+                else
+                {
+                    order.CustomerId = user.Id;   
+                }
+            }
+           
+            
             try
             {
                 var newOrder = await _orderService.CreateOrderAsync(order);
-                return Ok(newOrder);
+                return CreatedAtAction(nameof(GetOrder), new { orderId = newOrder.Id }, newOrder);
             }
             catch (Exception e)
             {
