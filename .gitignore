@@ -78,3 +78,6 @@ bin/Debug/net8.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
 bin/Debug/net8.0/Microsoft.AspNetCore.Identity.EntityFrameworkCore.dll
 bin/Debug/net8.0/Microsoft.Bcl.TimeProvider.dll
 bin/Debug/net8.0/Microsoft.IdentityModel.Abstractions.dll
+obj/Debug/net8.0/ecommerce-api.xml
+bin/Debug/net8.0/ecommerce-api.xml
+bin/Debug/net8.0/Microsoft.EntityFrameworkCore.InMemory.dll
