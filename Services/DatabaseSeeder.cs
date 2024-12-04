@@ -52,13 +52,17 @@ namespace ecommerce_api.Services.JWT
                 var categories = new List<Category>
                 {
                     new Category { Name = "Phones" },
-                    new Category { Name = "Laptops" },
-                    new Category { Name = "Tablets" },
-                    new Category { Name = "Smartwatches" },
+                    new Category { Name = "Samsung" },
+                    new Category { Name = "Apple" },
+                    new Category { Name = "Google" },
+                    new Category { Name = "Xiaomi" },
+                    new Category { Name = "Vivo" },
+                    new Category { Name = "Realme" },
                     new Category { Name = "Accessories" },
-                    new Category { Name = "Android" },
+                    new Category { Name = "Cases" },
                     new Category { Name = "iOS" },
-                    new Category { Name = "Windows" },
+                    new Category { Name = "Android" },
+                    new Category { Name = "Tablets" },
                 };
                 await _context.Categories.AddRangeAsync(categories);
             }
