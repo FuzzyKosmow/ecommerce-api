@@ -404,13 +404,18 @@ namespace ecommerce_api.Controllers
         [HttpPut("{id}")]
         public async Task<ActionResult<ProductDTO>> UpdateProduct(int id, UpdateProductDTO productDTO)
         {
+            // Find the product with its related categories
             var product = await _context.Products.Include(p => p.Categories).FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
             {
                 return NotFound();
             }
+
+            // Map updated properties from DTO to the product entity
             _mapper.Map(productDTO, product);
+
+            // Update specific properties manually if required ( lists)
             _context.Entry(product).Property(p => p.Colors).IsModified = true;
             _context.Entry(product).Property(p => p.StorageOptions).IsModified = true;
             _context.Entry(product).Property(p => p.StorageModifiers).IsModified = true;
@@ -418,29 +423,107 @@ namespace ecommerce_api.Controllers
 
             Console.WriteLine("Best seller status: " + product.IsBestSeller);
 
-
+            // Handle category updates (tags)
             var currentCategoryIds = product.Categories.Select(c => c.Id).ToList();
-
-            // Compare with the incoming category IDs from productDTO
             var newCategoryIds = productDTO.CategoryIds ?? new List<int>();
-            // Only update categories if there are changes
-            if (!currentCategoryIds.SequenceEqual(newCategoryIds))
-            {
-                // Get the categories to be associated with this product
-                var categories = await _context.Categories
-                    .Where(c => newCategoryIds.Contains(c.Id))
-                    .ToListAsync();
 
-                // Update the product's categories
-                product.Categories = categories;
+            // Step 1: Remove categories that are no longer in the incoming list
+            var categoriesToRemove = product.Categories.Where(c => !newCategoryIds.Contains(c.Id)).ToList();
+            foreach (var categoryToRemove in categoriesToRemove)
+            {
+                product.Categories.Remove(categoryToRemove);
             }
 
+            // Step 2: Add new categories (tags) that don't exist
+            foreach (var categoryId in newCategoryIds)
+            {
+                if (!currentCategoryIds.Contains(categoryId))
+                {
+                    // Find the category in the database, or create a new one if it doesn't exist
+                    var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == categoryId);
+                    if (category == null)
+                    {
+                        // Create a new category if not found
+                        category = new Category { Id = categoryId };
+
+                        await _context.Categories.AddAsync(category);
+                    }
+                    product.Categories.Add(category);
+                }
+            }
+
+            // Save the changes to the database
             await _context.SaveChangesAsync();
 
+            // Map the updated product back to DTO for response
             var productDTOToReturn = _mapper.Map<ProductDTO>(product);
             Console.WriteLine("Best seller status after update: " + product.IsBestSeller);
+
             return Ok(productDTOToReturn);
         }
+
+        // Add new category. Take name
+        [HttpPost("category")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<CategoryDTO>> CreateCategory([FromBody] string name)
+        {
+            // Check if new name exists
+            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Name == name);
+            if (category != null)
+            {
+                return BadRequest("Category already exists");
+            }
+            category = new Category { Name = name };
+            await _context.Categories.AddAsync(category);
+            await _context.SaveChangesAsync();
+            var categoryDTO = _mapper.Map<CategoryDTO>(category);
+            return CreatedAtAction(nameof(GetCategories), categoryDTO);
+        }
+
+        // Update category name
+        [HttpPut("category/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<CategoryDTO>> UpdateCategory(
+            int id,
+            [FromBody] string newName)
+        {
+            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            category.Name = newName;
+            await _context.SaveChangesAsync();
+            var categoryDTO = _mapper.Map<CategoryDTO>(category);
+            return Ok(categoryDTO);
+        }
+
+        // Delete category. Also delete the category from all products (joint table)
+        [HttpDelete("category/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> DeleteCategory(int id)
+        {
+            // First delete the category from all products
+            var products = await _context.Products.Include(p => p.Categories).Where(p => p.Categories.Any(c => c.Id == id)).ToListAsync();
+            foreach (var product in products)
+            {
+                var cat = product.Categories.FirstOrDefault(c => c.Id == id);
+                product.Categories.Remove(cat);
+            }
+            // Then delete the category
+            var category = await _context.Categories.FirstOrDefaultAsync(c => c.Id == id);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            _context.Categories.Remove(category);
+            await _context.SaveChangesAsync();
+            return NoContent();
+
+        }
+
+
+
 
 
         [HttpDelete("{id}")]

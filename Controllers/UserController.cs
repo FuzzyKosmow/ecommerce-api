@@ -220,6 +220,20 @@ namespace ecommerce_api.Controllers
             var userDtos = await AssignTotalOrdersAndTotalValue(users);
             return Ok(userDtos);
         }
+        [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult> DeleteUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+            {
+                return NotFound();
+            }
+            await _userManager.DeleteAsync(user);
+            return Ok("User deleted successfully");
+        }
+
+
         // Utils function to assign TotalOrders and TotalValue to a user. Accept an array of users
         private async Task<List<UserDto>> AssignTotalOrdersAndTotalValue(List<ApplicationUser> users)
         {

@@ -8,6 +8,7 @@ namespace ecommerce_api.Models
 {
     /// <summary>
     /// Represents a voucher that can be used to get a discount on an order. By design its applicable to all products.
+    /// Can be used once by a user.
     /// </summary>
     public class Voucher
 
