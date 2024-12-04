@@ -43,9 +43,9 @@ namespace ecommerce_api.Services.OrderService
             Order newOrder = new Order
             {
                 UserId = order.CustomerId,
-                Status = "Pending",
+                Status = "PENDING",
                 OrderDate = DateTime.Now,
-                CustomerName = order.CustomerName,  
+                CustomerName = order.CustomerName,
                 // Contact props
                 Address = order.Address,
                 Province = order.Province,
@@ -79,6 +79,9 @@ namespace ecommerce_api.Services.OrderService
                 // Check matching if color and storage exist. Check if storage and modifier match
                 if (product.Colors != null && product.Colors.Count > 0 && !product.Colors.Contains(orderDetail.Color))
                 {
+                    Console.WriteLine("Color not found");
+                    Console.WriteLine("Product colors: " + string.Join(",", product.Colors));
+                    Console.WriteLine("Order color: " + orderDetail.Color);
                     throw new Exception("Color not found");
                 }
                 if (product.StorageOptions != null && product.StorageOptions.Count > 0 && !product.StorageOptions.Contains(orderDetail.Storage))

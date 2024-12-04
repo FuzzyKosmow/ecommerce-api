@@ -109,6 +109,14 @@ namespace ecommerce_api.Services.VoucherService
             }
             return true;
         }
-
+        public async Task<decimal> GetDiscountAmount(string voucherCode)
+        {
+            var voucher = await _context.Vouchers.FirstOrDefaultAsync(v => v.Code == voucherCode);
+            if (voucher == null)
+            {
+                return 0;
+            }
+            return voucher.DiscountPercentage;
+        }
     }
 }

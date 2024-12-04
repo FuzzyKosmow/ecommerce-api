@@ -20,5 +20,7 @@ namespace ecommerce_api.Services.VoucherService
         /// Generate a random voucher code. 6 characters long and does not exist in the database
         /// </summary>
         Task<string> GenerateVoucherCode();
+        
+        Task<decimal> GetDiscountAmount(string voucherCode);
     }
 }
