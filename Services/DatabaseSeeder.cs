@@ -65,13 +65,20 @@ namespace ecommerce_api.Services.JWT
                     new Category { Name = "Tablets" },
                 };
                 await _context.Categories.AddRangeAsync(categories);
+                await _context.SaveChangesAsync();
             }
 
             // Check if there are any existing products in the database
             if (await _context.Products.CountAsync() == 0)
             {
-                // Sample product data
-                var sampleProduct = new Product
+                var samsungCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Name == "Samsung");
+                var appleCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Name == "Apple");
+                var googleCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Name == "Google");
+                var xiaomiCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Name == "Xiaomi");
+                var vivoCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Name == "Vivo");
+                var realmeCategory = await _context.Categories.FirstOrDefaultAsync(c => c.Name == "Realme");
+
+                var samsung1 = new Product
                 {
                     Name = "Samsung 15 Plus 512GB",
                     Price = 30890000,
@@ -96,12 +103,12 @@ namespace ecommerce_api.Services.JWT
                         { "Display Technology", "Super Retina XDR" },
                         { "Resolution", "2796 x 1290" },
                         { "Screen Size", "6.7 inches" }
-                    })
-
+                    }),
+                    Categories = new List<Category> { samsungCategory },
                 };
 
                 //Add products 3 times
-                var sample2 = new Product
+                var iphone1 = new Product
                 {
                     Name = "Iphone 15 Plus 512GB",
                     Price = 30890000,
@@ -127,10 +134,11 @@ namespace ecommerce_api.Services.JWT
                         { "Resolution", "2796 x 1290" },
                         { "Screen Size", "6.7 inches" }
                     }),
+                    Categories = new List<Category> { appleCategory },
                     IsNewArrival = true
                 };
 
-                var sample3 = new Product
+                var google1 = new Product
                 {
                     Name = "Google 15 Plus 512GB",
                     Price = 30890000,
@@ -158,11 +166,12 @@ namespace ecommerce_api.Services.JWT
                     }),
                     IsBestSeller = true,
                     IsFeatured = true
-
+                    ,
+                    Categories = new List<Category> { googleCategory },
                 };
 
 
-                var sample4 = new Product
+                var xiaomi = new Product
                 {
                     Name = "Xiaomi Poco M6 Pro",
                     Price = 30890000,
@@ -187,7 +196,8 @@ namespace ecommerce_api.Services.JWT
                     }),
                     ReleaseDate = new DateTime(2023, 8, 5),
                     CreatedAt = DateTime.Now,
-                    IsNewArrival = true
+                    IsNewArrival = true,
+                    Categories = new List<Category> { xiaomiCategory },
                 };
 
 
@@ -259,23 +269,15 @@ namespace ecommerce_api.Services.JWT
                     ReleaseDate = new DateTime(2024, 11, 5), // Release date
                     CreatedAt = DateTime.Now, // Automatically set to current time
                     IsNewArrival = true // Marked as a new arrival
+                    ,
+                    Categories = new List<Category> { realmeCategory }
+
                 };
 
 
-                await _context.Products.AddRangeAsync(sampleProduct, sample2, sample3, sample4, vivo, realme13);
-                await _context.SaveChangesAsync();
+                await _context.Products.AddRangeAsync(samsung1, iphone1, google1, xiaomi, vivo, realme13);
 
-                // Assign random categories to each product
-                var categories = await _context.Categories.ToListAsync();
-                var productsToAssign = await _context.Products.ToListAsync();
 
-                foreach (var product in productsToAssign)
-                {
-                    var random = new Random();
-                    var randomCategories = categories.OrderBy(x => random.Next()).Take(2).ToList();
-                    product.Categories = randomCategories;
-
-                }
                 await _context.SaveChangesAsync();
 
 
@@ -390,6 +392,7 @@ namespace ecommerce_api.Services.JWT
             {
                 CustomerId = firstUserInDb.Id,
                 PaymentMethod = "Credit Card",
+                CustomerName = firstUserInDb.FullName,
                 OrderDetails = new List<CreateOrderDetailDTO>()
                 {
                     new CreateOrderDetailDTO
